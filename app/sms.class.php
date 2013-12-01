@@ -8,10 +8,11 @@ class sms {
   public $destinataire;
   public $message;
 
-  public function __construct($email=null, $tel=null, $msg=null) {
+  public function __construct($email=null, $tel=null, $msg=null, $id=null) {
     $this->email        = $email;
     $this->destinataire = isset($tel) ? substr($tel,-9) : null;
     $this->message      = isset($msg) ? escapeshellarg($msg) : null;
+    $this->id           = $id;
   }
 
   public function queue() {
