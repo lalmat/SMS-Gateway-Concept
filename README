@@ -1,0 +1,13 @@
+This is the SMS Gateway Concept
+
+I've created this solution to make an SMS Gateway on a Rapsberry PI using :
+
+Hardware required :
+- A RaspberryPI
+- An old cellular phone ( with an active SIM card inside obviously ! )
+- An USB-to-Phone cable
+
+Software required :
+- Apache/PHP
+- MySQL
+- Gammu

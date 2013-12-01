@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SMS Sender</title>
+  <script type="text/javascript" src="jquery.min.js"></script>
+  <script type="text/javascript" src="sms.js"></script>
+  <script type="text/javascript">
+
+    sms.route = "app/sms.php?mode=queue"; // A configurer avec votre route
+
+    function sendSMS() {
+      var email = $("#sms_email").val();
+      var tel   = $("#sms_tel").val();
+      var text  = $("#sms_text").val();
+
+      sms.send(email, tel, text,
+        function() { // On Success
+          $("#smsResult").html("SMS Envoy&eacute; !").fadeIn();
+          $("#sms_email").val("");
+          $("#sms_tel").val("");
+          $("#sms_text").val("");
+          setTimeout("$('#smsResult').fadeOut()", 1250);
+        },
+        function() { // On Error
+          $("#smsResult").html("Erreur d'envoi !").fadeIn();
+          setTimeout("$('#smsResult').fadeOut()", 1250);
+        }
+      );
+    }
+  </script>
+</head>
+
+<body>
+	<div id="smsFormContainer">
+		<h2>SMS Gateway Tester</h2>
+		<form id="smsForm">
+		  <input type="email" id="sms_email" name="email" placeholder="Votre adresse e-mail" value=""><br />
+		  <span>+33 (0)</span>
+		  <input type="text"  id="sms_tel" name="tel" placeholder="n&deg; destinataire" value=""><br />
+		  <textarea id="sms_text" name="sms_text" placeholder="Votre message">Hello World !</textarea>
+		</form>
+	</div>
+	<div id="smsResult"></div>
+	<button type="button" onclick="sendSMS()">Envoyer</button>
+</body>
+
+</html>

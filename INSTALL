@@ -1,0 +1,24 @@
+MySQL :
+-------
+- create a database named "db_sms-gateway"
+- create a new db user to access to this database
+- use the app/db.sql script to create database tables
+MySQL is Ready !
+
+
+Apache/PHP API :
+----------------
+- copy the "app" and the "test" directory to a directory in you webroot
+- configure the "app/config.app.php" according to the db user and pass you've defined above.
+API is Ready. Test it (http://your-server/test/)
+
+
+Agent :
+-------
+- copy the "agent" directory to your root directory (or some user which can use Gammu)
+- configure the "config.agent.php" to fit you needs, the defaults setting may be good for you
+- change the cronjob line to fit your agent's path and add it to the cron
+Agent is Ready !
+
+
+SMS should be sent in a minute ! (start by checking your gammu config if problem !)
