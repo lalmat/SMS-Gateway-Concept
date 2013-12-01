@@ -1,19 +1,20 @@
 var sms = {
 
 	// Route par défaut vers l'API
-  route: "app/sms.php?mode=save",
+  route: "../app/sms.php?mode=queue",
 
   // Appel du WebService d'ajout de SMS.
   send: function(email, tel, text, onSuccessCallback, onErrorCallback) {
 		if ( sms.check(email, tel, text) ) {
-			var url = sms.route+"&email="+email+"&tel="+tel+"&msg="+encodeURI(msg);
+			var url = sms.route+"&email="+email+"&tel="+tel+"&msg="+encodeURI(text);
 			$.get(url, function(r) {
 				if (r) {
-          if (onSuccessCallback != null) onSuccess.call();
+          if (onSuccessCallback != null) onSuccessCallback.call();
 				} else {
-					if (onErrorCallback != null) onSuccess.call();
+					if (onErrorCallback != null) onErrorCallback.call();
 				}
 			},'json');
+    }
 	},
 
 	// Vérifie la validité des données envoyées
@@ -23,7 +24,7 @@ var sms = {
   	allOK = re.test(email);
 
   	if (allOK) {
-  		allOK = (numero != "") && text != ""); //TODO: Remplacer ici par un test un peu plus solide...
+  		allOK = (tel != "" && text != ""); //TODO: Remplacer ici par un test un peu plus solide...
   	}
 
   	return allOK;

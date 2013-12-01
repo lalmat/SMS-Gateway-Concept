@@ -1,78 +1,86 @@
 <?php
+// Clearly need some static methods here.
+
 class sms {
 
-	public $id;
-	public $email;
-	public $destinataire;
+  public $id;
+  public $email;
+  public $destinataire;
   public $message;
 
-  private $db_dsn;
-  private $db_user;
-  private $db_pass;
+  public function __construct($email=null, $tel=null, $msg=null) {
+    $this->email        = $email;
+    $this->destinataire = isset($tel) ? substr($tel,-9) : null;
+    $this->message      = isset($msg) ? escapeshellarg($msg) : null;
+  }
 
-	public function __construct($email, $tel, $msg) {
+  public function queue() {
+    include_once("config.app.php");
+    try {
 
-		include("config.app.php");
-		$this->db_dns  = $cfg['DB_DSN'];
-		$this->db_user = $cfg['DB_USR'];
-		$this->db_pass = $cfg['DB_PWD'];
+      $db = new PDO($cfg['DB_DSN'], $cfg['DB_USR'], $cfg['DB_PWD']);
 
-		$this->email        = $email;
-		$this->destinataire = substr($tel,-9);
-		$this->message      = escapeshellarg($msg);
-	}
+      $sql = "INSERT INTO sms (sms_email, sms_dest, sms_msg, sms_datetime, sms_state)
+              VALUES (:email, :dest, :msg, now(), 0);";
 
-	public function queue() {
-		$db = new PDO($this->db_dsn, $this->db_user, $this->db_pass);
+      $stm = $db->prepare($sql);
 
-		$sql = "INSERT INTO sms (sms_email, sms_dest, sms_msg, sms_datetime, sms_state)
-				    VALUES (:email, :dest, :msg, now(), 0);";
+      $values[':email'] = $this->email;
+      $values[':dest']  = $this->destinataire;
+      $values[':msg']   = $this->message;
 
-		$stm = $db->prepare($sql);
+      $rs = ($stm->execute($values) !== FALSE);
 
-		$values[':email'] = $this->email;
-		$values[':dest']  = $this->destinataire;
-		$values[':msg']   = $this->message;
+      unset($stm);
+      unset($db);
+    }
+    catch(Exception $e) {
+      echo $e->getMessage();
+    }
+    return $rs;
+  }
 
-		$rs = ($stm->execute($values) !== FALSE);
+  public static function fetch() {
+    $sms = null;
+    include_once("config.app.php");
+    try {
 
-		unset($stm);
-		unset($db);
+      $db = new PDO($cfg['DB_DSN'], $cfg['DB_USR'], $cfg['DB_PWD']);
 
-		return $rs;
-	}
+      $sql = "SELECT sms_id, sms_email, sms_dest, sms_msg
+              FROM sms
+              WHERE sms_state=0
+              ORDER BY sms_id
+              LIMIT 0,1";
 
-	public function fetch() {
-		$db = new PDO($this->db_dsn, $this->db_user, $this->db_pass);
-		$sql = "SELECT sms_id, sms_email, sms_dest, sms_msg
-				    FROM sms
-				    WHERE sms_state=0
-				    ORDER BY sms_id
-				    LIMIT 0,1";
+      $s = $db->query($sql);
 
-		$s = $db->query($sql);
+      $rAry = $s->fetch(PDO::FETCH_ASSOC);
+      unset($s);
+      unset($db);
 
-		$rAry = $s->fetch(PDO::FETCH_ASSOC);
-		unset($s);
-		unset($db);
+      $sms = new self($rAry['sms_email'], $rAry['sms_dest'], $rAry['sms_msg'], $rAry['sms_id']);
+    }
+    catch(Exception $e) {
+      echo $e->getMessage();
+    }
+    return $sms;
+  }
 
-		if (is_array($rAry)) {
-			$this->id           = $rAry['sms_id'];
-			$this->email        = $rAry['sms_email'];
-			$this->destinataire = $rAry['sms_dest'];
-			$this->message      = $rAry['sms_msg'];
-		  return true;
-		} else {
-			return false;
-		}
-	}
+  public static function ack($id) {
+    $rs = false;
+    include_once("config.app.php");
+    try {
 
-	public function ack($id) {
-		$db = new PDO($this->db_dsn, $this->db_user, $this->db_pass);
-		$stm = $db->prepare("UPDATE sms SET sms_state=1, sms_datetime=NOW() WHERE sms_id=:id");
-		$rs = $stm->execute(array(":id"=>$id));
-		unset($db);
-		return ($rs !== FALSE) ;
+      $db = new PDO($cfg['DB_DSN'], $cfg['DB_USR'], $cfg['DB_PWD']);
+      $stm = $db->prepare("UPDATE sms SET sms_state=1, sms_datetime=NOW() WHERE sms_id=:id");
+      $rs = $stm->execute(array(":id"=>$id));
+      unset($db);
+    }
+    catch(Exception $e) {
+      echo $e->getMessage();
+    }
+    return ($rs !== FALSE) ;
   }
 
 }

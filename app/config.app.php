@@ -1,6 +1,6 @@
 <?php
 
 // Database configuration
-$cfg['DB_DSN'] = "mysql:host=localhost;dbname=db_sms-gateway";
-$cfg['DB_USR'] = "root";
+$cfg['DB_DSN'] = "mysql:host=localhost;dbname=sms";
+$cfg['DB_USR'] = "sms";
 $cfg['DB_PWD'] = "";

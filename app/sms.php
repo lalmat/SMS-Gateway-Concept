@@ -1,6 +1,6 @@
 <?php
+// This is absolutly not optimized ! Sorry ;)
 require("sms.class.php");
-include("config.app.php");
 
 $rs = "SMS Gateway API";
 
@@ -12,11 +12,11 @@ switch($_GET['mode']) {
 		break;
 
 	case "fetch":
-		$rs = $sms->fetch();
+		$rs = sms::fetch();
 		break;
 
 	case "ack":
-		$rs = $sms->ack($_GET['id']);
+		$rs = sms::ack($_GET['id']);
 		break;
 }
 
